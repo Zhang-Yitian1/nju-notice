@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>南大新生通知</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    (function () {
+      var saved = localStorage.getItem("theme");
+      var theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+</head>
+<body>
+  <div class="header">
+    <h1>南大新生通知</h1>
+    <button id="themeToggle">深色</button>
+  </div>
+  <div class="sub">聚合校内通知与活动 · 按年级筛选 · 更新于 __UPDATED__</div>
+  <div class="filters" id="filters"></div>
+  <ul id="list"></ul>
+  <script>
+    var NOTICES = __NOTICES__;
+    var GRADES = ["全部", "2026", "2025", "2024", "2023"];
+    var TYPE_CLASS = { "活动": "activity", "通知": "notice" };
+    var current = "全部";
+
+    function esc(s) {
+      return String(s).replace(/[&<>"]/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+      });
+    }
+
+    function render() {
+      var list = document.getElementById("list");
+      var items = NOTICES.filter(function (n) {
+        return current === "全部" || n.grades.indexOf(current) !== -1;
+      });
+      items.sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+      if (!items.length) {
+        list.innerHTML = '<div class="empty">这个年级暂时没有通知</div>';
+        return;
+      }
+      list.innerHTML = items.map(function (n) {
+        var tags = n.tags.map(function (t) { return "#" + esc(t); }).join(" ");
+        var cls = TYPE_CLASS[n.type] || "notice";
+        var deadline = n.deadline ? '<span class="deadline">截止 ' + esc(n.deadline) + "</span>" : "";
+        return '<li class="notice">'
+          + '<div class="meta"><span class="badge ' + cls + '">' + esc(n.type) + "</span> "
+          + esc(n.date) + " · " + esc(n.organizer || n.source) + "</div>"
+          + '<a class="title" href="' + esc(n.url) + '" target="_blank">' + esc(n.title) + "</a>"
+          + '<div class="tags">' + tags + deadline + "</div>"
+          + "</li>";
+      }).join("");
+    }
+
+    function renderFilters() {
+      var box = document.getElementById("filters");
+      box.innerHTML = GRADES.map(function (g) {
+        return '<a class="' + (g === current ? "active" : "") + '" data-grade="' + g + '" href="javascript:;">' + g + "</a>";
+      }).join("");
+      box.querySelectorAll("a").forEach(function (a) {
+        a.addEventListener("click", function () {
+          current = a.dataset.grade;
+          renderFilters();
+          render();
+        });
+      });
+    }
+
+    var btn = document.getElementById("themeToggle");
+    function refreshBtn() {
+      btn.textContent = document.documentElement.dataset.theme === "dark" ? "浅色" : "深色";
+    }
+    refreshBtn();
+    btn.addEventListener("click", function () {
+      var next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem("theme", next);
+      refreshBtn();
+    });
+
+    renderFilters();
+    render();
+  </script>
+</body>
+</html>

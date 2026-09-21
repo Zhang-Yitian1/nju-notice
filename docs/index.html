@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>南大新生通知</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    (function () {
+      var saved = localStorage.getItem("theme");
+      var theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+</head>
+<body>
+  <div class="header">
+    <h1>南大新生通知</h1>
+    <button id="themeToggle">深色</button>
+  </div>
+  <div class="sub">聚合校内通知与活动 · 按年级筛选 · 更新于 2026-09-21 22:51</div>
+  <div class="filters" id="filters"></div>
+  <ul id="list"></ul>
+  <script>
+    var NOTICES = [{"id": 1, "title": "2026年秋季学期公开课观摩信息（实时更新）（校内用户访问）", "source": "教务处", "organizer": "教务处", "type": "通知", "date": "2026-09-21", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/e2/d5/c26263a844501/page.htm", "summary": ""}, {"id": 2, "title": "关于公示南京大学高等教育领域学科大模型拟推荐名单的通知", "source": "教务处", "organizer": "本科生院", "type": "通知", "date": "2026-09-20", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/e2/54/c26263a844372/page.htm", "summary": ""}, {"id": 3, "title": "2026年10月14日、10月16日普通话水平测试网络报名通知及本学期测试计划安排", "source": "教务处", "organizer": "本科生院综合办公室（数据中心）", "type": "活动", "date": "2026-09-17", "deadline": "2026-10-14", "grades": ["2026", "2025", "2024", "2023"], "tags": ["考试", "信息"], "url": "https://jw.nju.edu.cn/e1/84/c26263a844164/page.htm", "summary": ""}, {"id": 4, "title": "【老生】2026年12月四、六级考试报名通知", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "活动", "date": "2026-09-16", "deadline": "", "grades": ["2025", "2024", "2023"], "tags": ["考试"], "url": "https://jw.nju.edu.cn/e1/0a/c26263a844042/page.htm", "summary": ""}, {"id": 5, "title": "关于“建行杯”江苏大学生创新大赛（2026）期间教学楼封闭的温馨提示", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "活动", "date": "2026-09-16", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/e1/03/c26263a844035/page.htm", "summary": ""}, {"id": 6, "title": "“敦煌文化”本科生主题研修项目（2026年）报名通知", "source": "教务处", "organizer": "本科生院", "type": "活动", "date": "2026-09-15", "deadline": "2026-09-22", "grades": ["2026", "2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/e0/9b/c26263a843931/page.htm", "summary": ""}, {"id": 7, "title": "成绩更正审核结果公示（2026-09-11）", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "通知", "date": "2026-09-11", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/df/7f/c26263a843647/page.htm", "summary": ""}, {"id": 8, "title": "【老生】2026年秋季学期“悦读经典计划”导读班课程群信息", "source": "教务处", "organizer": "本科生院教育教学发展与评估中心", "type": "通知", "date": "2026-09-09", "deadline": "", "grades": ["2025", "2024", "2023"], "tags": ["课程"], "url": "https://jw.nju.edu.cn/de/30/c26263a843312/page.htm", "summary": ""}, {"id": 9, "title": "关于招募2026年度南京大学本科生“奔赴计划”——“城市有机废弃物高值转化与循环利用”研修项目学员的通知", "source": "教务处", "organizer": "本科生院", "type": "活动", "date": "2026-09-09", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/de/fa/c26263a843514/page.htm", "summary": ""}, {"id": 10, "title": "【老生】2026年下半年四六级考试相关通知汇总", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "通知", "date": "2026-09-08", "deadline": "2026-09-22", "grades": ["2025", "2024", "2023"], "tags": ["考试"], "url": "https://jw.nju.edu.cn/dd/d0/c26263a843216/page.htm", "summary": ""}, {"id": 11, "title": "【老生】2026年12月全国大学英语四、六级考试报名前  信息核对通知", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "活动", "date": "2026-09-08", "deadline": "", "grades": ["2025", "2024", "2023"], "tags": ["考试"], "url": "https://jw.nju.edu.cn/dd/cc/c26263a843212/page.htm", "summary": ""}, {"id": 12, "title": "【2026级新生】“悦读经典计划”选课通知", "source": "教务处", "organizer": "本科生院教育教学发展与评估中心", "type": "通知", "date": "2026-09-07", "deadline": "2026-09-30", "grades": ["2026"], "tags": ["选课"], "url": "https://jw.nju.edu.cn/dd/80/c26263a843136/page.htm", "summary": ""}, {"id": 13, "title": "关于公布2026年华五“AI+X”微专业南京大学学生入选名单的通知", "source": "教务处", "organizer": "本科生院教育教学发展与评估中心", "type": "通知", "date": "2026-09-07", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/dd/74/c26263a843124/page.htm", "summary": ""}, {"id": 14, "title": "中国国际大学生创新大赛（2026） 南京大学产业赛道推荐省赛项目名单", "source": "教务处", "organizer": "教务处", "type": "活动", "date": "2026-09-02", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["信息"], "url": "https://scit.nju.edu.cn/db/b9/c10916a842681/pagem.htm", "summary": ""}, {"id": 15, "title": "【转发】网络通识课《自然灾害与人》开课通知", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "通知", "date": "2026-08-31", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/db/74/c26263a842612/page.htm", "summary": ""}, {"id": 16, "title": "2026级本科生二次选拔第一批次预录取学生选课说明", "source": "教务处", "organizer": "本科生院", "type": "通知", "date": "2026-08-28", "deadline": "", "grades": ["2026"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/da/7c/c26263a842364/page.htm", "summary": ""}, {"id": 17, "title": "2026-2027学年第一学期公共课补缓考安排", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "通知", "date": "2026-08-28", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["考试", "信息"], "url": "https://jw.nju.edu.cn/da/6e/c26263a842350/page.htm", "summary": ""}, {"id": 18, "title": "【老生】关于体育课程增加选课名额的通知", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "通知", "date": "2026-08-26", "deadline": "", "grades": ["2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d9/34/c26263a842036/page.htm", "summary": ""}, {"id": 19, "title": "关于陈琳副院长因公赴澳门参加会议的公示", "source": "教务处", "organizer": "本科生院综合办公室（数据中心）", "type": "通知", "date": "2026-08-26", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d9/0c/c26263a841996/page.htm", "summary": ""}, {"id": 20, "title": "【2026级新生】劳动教育学习导引+慕课选修说明", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "通知", "date": "2026-08-24", "deadline": "", "grades": ["2026"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d8/13/c26263a841747/page.htm", "summary": ""}, {"id": 21, "title": "【2026级新生】开学教务安排汇总", "source": "教务处", "organizer": "本科生院", "type": "通知", "date": "2026-08-21", "deadline": "", "grades": ["2026"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d7/c4/c26263a841668/page.htm", "summary": ""}, {"id": 22, "title": "【老生】2026年秋季学期本科教务事项通知", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "通知", "date": "2026-08-21", "deadline": "", "grades": ["2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d7/6f/c26263a841583/page.htm", "summary": ""}, {"id": 23, "title": "【2026级新生】大类培养学科分流、专业准入实施方案一览表（2026修订版）", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "通知", "date": "2026-08-21", "deadline": "", "grades": ["2026"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d7/7c/c26263a841596/page.htm", "summary": ""}, {"id": 24, "title": "【2026级新生】美育通识课选课通知", "source": "教务处", "organizer": "本科生院教育教学发展与评估中心", "type": "通知", "date": "2026-08-21", "deadline": "", "grades": ["2026"], "tags": ["课程"], "url": "https://jw.nju.edu.cn/d7/74/c26263a841588/page.htm", "summary": ""}, {"id": 25, "title": "【2026级新生】“科学之光”系列课程选课通知", "source": "教务处", "organizer": "本科生院教育教学发展与评估中心", "type": "通知", "date": "2026-08-21", "deadline": "", "grades": ["2026"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d7/70/c26263a841584/page.htm", "summary": ""}, {"id": 26, "title": "【2026级新生】关于启动2026年秋季学期本科生劳动教育实践工作的通知", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "通知", "date": "2026-08-21", "deadline": "", "grades": ["2026"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d7/6d/c26263a841581/page.htm", "summary": ""}, {"id": 27, "title": "【教师|学生】2026-2027学年第一学期停调课信息（实时更新）", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "通知", "date": "2026-08-21", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d7/6c/c26263a841580/page.htm", "summary": ""}, {"id": 28, "title": "【学生】南京大学高年级本科生公共体育课程学习须知  （2026年8月）", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "通知", "date": "2026-08-20", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["课程"], "url": "https://jw.nju.edu.cn/d6/c4/c26263a841412/page.htm", "summary": ""}, {"id": 29, "title": "【老生】2023和2024级学生《形势与政策》课程补（重）修通知", "source": "教务处", "organizer": "本科生院教学运行服务中心", "type": "通知", "date": "2026-08-20", "deadline": "2026-08-30", "grades": ["2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d6/bf/c26263a841407/page.htm", "summary": ""}, {"id": 30, "title": "【2026级新生】学籍电子注册通知", "source": "教务处", "organizer": "本科生院", "type": "通知", "date": "2026-08-18", "deadline": "", "grades": ["2026"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d6/2e/c26263a841262/page.htm", "summary": ""}, {"id": 31, "title": "关于2026年本科生《军事技能训练》《国家安全教育》课程安排的通知（8月27日更新）", "source": "教务处", "organizer": "本科生院", "type": "通知", "date": "2026-08-17", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d6/3c/c26263a841276/page.htm", "summary": ""}, {"id": 32, "title": "【2026级新生】学籍电子照片采集通知", "source": "教务处", "organizer": "本科生院", "type": "通知", "date": "2026-08-17", "deadline": "", "grades": ["2026"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d6/29/c26263a841257/page.htm", "summary": ""}, {"id": 33, "title": "南京大学关于开展2026级本科生二次选拔工作的通知", "source": "教务处", "organizer": "本科生院教育教学发展与评估中心", "type": "通知", "date": "2026-08-15", "deadline": "", "grades": ["2026"], "tags": ["信息"], "url": "https://jw.nju.edu.cn/d6/16/c26263a841238/page.htm", "summary": ""}, {"id": 34, "title": "图书馆关于暑假开放时间的通知", "source": "图书馆", "organizer": "图书馆", "type": "通知", "date": "2026-07-09", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": [], "url": "https://lib.nju.edu.cn/info/1065/4326.htm", "summary": ""}, {"id": 35, "title": "【藜照馆坛第二十五期】探秘胰岛素：一场跨越世纪的医药探索", "source": "图书馆", "organizer": "图书馆", "type": "通知", "date": "2026-06-12", "deadline": "", "grades": ["2026", "2025", "2024", "2023"], "tags": [], "url": "https://lib.nju.edu.cn/info/1065/4314.htm", "summary": ""}];
+    var GRADES = ["全部", "2026", "2025", "2024", "2023"];
+    var TYPE_CLASS = { "活动": "activity", "通知": "notice" };
+    var current = "全部";
+
+    function esc(s) {
+      return String(s).replace(/[&<>"]/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+      });
+    }
+
+    function render() {
+      var list = document.getElementById("list");
+      var items = NOTICES.filter(function (n) {
+        return current === "全部" || n.grades.indexOf(current) !== -1;
+      });
+      items.sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+      if (!items.length) {
+        list.innerHTML = '<div class="empty">这个年级暂时没有通知</div>';
+        return;
+      }
+      list.innerHTML = items.map(function (n) {
+        var tags = n.tags.map(function (t) { return "#" + esc(t); }).join(" ");
+        var cls = TYPE_CLASS[n.type] || "notice";
+        var deadline = n.deadline ? '<span class="deadline">截止 ' + esc(n.deadline) + "</span>" : "";
+        return '<li class="notice">'
+          + '<div class="meta"><span class="badge ' + cls + '">' + esc(n.type) + "</span> "
+          + esc(n.date) + " · " + esc(n.organizer || n.source) + "</div>"
+          + '<a class="title" href="' + esc(n.url) + '" target="_blank">' + esc(n.title) + "</a>"
+          + '<div class="tags">' + tags + deadline + "</div>"
+          + "</li>";
+      }).join("");
+    }
+
+    function renderFilters() {
+      var box = document.getElementById("filters");
+      box.innerHTML = GRADES.map(function (g) {
+        return '<a class="' + (g === current ? "active" : "") + '" data-grade="' + g + '" href="javascript:;">' + g + "</a>";
+      }).join("");
+      box.querySelectorAll("a").forEach(function (a) {
+        a.addEventListener("click", function () {
+          current = a.dataset.grade;
+          renderFilters();
+          render();
+        });
+      });
+    }
+
+    var btn = document.getElementById("themeToggle");
+    function refreshBtn() {
+      btn.textContent = document.documentElement.dataset.theme === "dark" ? "浅色" : "深色";
+    }
+    refreshBtn();
+    btn.addEventListener("click", function () {
+      var next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem("theme", next);
+      refreshBtn();
+    });
+
+    renderFilters();
+    render();
+  </script>
+</body>
+</html>
