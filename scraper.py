@@ -2,7 +2,9 @@ import json
 import re
 import threading
 import time
+import xml.etree.ElementTree as ET
 from datetime import date, timedelta
+from email.utils import parsedate_to_datetime
 from html import unescape
 from html.parser import HTMLParser
 from pathlib import Path
@@ -139,6 +141,12 @@ SOURCES = [
         ],
         "exclude": ["【新闻】"],
     },
+    {
+        "name": "公众号",
+        "type": "rss",
+        "pages": ["https://werss.lilystudio.space/feed/all.rss"],
+        "enrich": False,
+    },
 ]
 
 
@@ -201,6 +209,26 @@ def enrich(url, publish_date):
     return organizer, deadline
 
 
+def parse_rss(text):
+    """解析 RSS 订阅源（公众号等）。"""
+    items = []
+    root = ET.fromstring(text)
+    for it in root.iter("item"):
+        title = (it.findtext("title") or "").strip()
+        link = (it.findtext("link") or it.findtext("guid") or "").strip()
+        pub = it.findtext("pubDate") or ""
+        d = ""
+        if pub:
+            try:
+                d = parsedate_to_datetime(pub).strftime("%Y-%m-%d")
+            except (TypeError, ValueError):
+                d = ""
+        items.append(
+            {"title": title, "url": link, "date": d, "category": ""}
+        )
+    return items
+
+
 def scrape():
     if not SCRAPE_LOCK.acquire(blocking=False):
         print("已有抓取在进行，跳过本次")
@@ -224,10 +252,15 @@ def _scrape():
                 print(f"  失败 {url} -> {e}")
                 continue
 
-            parser = source["parser"](url)
-            parser.feed(html)
+            if source.get("type") == "rss":
+                raw_items = parse_rss(html)
+            else:
+                parser = source["parser"](url)
+                parser.feed(html)
+                raw_items = parser.items
+
             added = 0
-            for raw in parser.items:
+            for raw in raw_items:
                 title = raw["title"]
                 if not title or raw["url"] in seen:
                     continue
@@ -248,14 +281,17 @@ def _scrape():
                         "tags": tags,
                         "url": raw["url"],
                         "summary": "",
+                        "_enrich": source.get("enrich", True),
                     }
                 )
                 added += 1
             print(f"  {url} -> 新增 {added} 条")
             time.sleep(0.5)
 
-    print(f"\n抽取正文信息（发布单位 / 截止日期），共 {len(notices)} 条…")
+    print(f"\n抽取正文信息（发布单位 / 截止日期）…")
     for n in notices:
+        if not n.pop("_enrich", True):
+            continue
         organizer, deadline = enrich(n["url"], n["date"])
         if organizer:
             n["organizer"] = organizer
