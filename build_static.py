@@ -4,9 +4,9 @@ from datetime import datetime
 from pathlib import Path
 
 import scraper
+import store
 
 BASE = Path(__file__).parent
-DATA_FILE = BASE / "data" / "notices.json"
 TEMPLATE = BASE / "templates" / "index.html"
 CSS = BASE / "static" / "style.css"
 OUT_DIR = BASE / "docs"
@@ -15,7 +15,7 @@ OUT_DIR = BASE / "docs"
 def main():
     scraper.scrape()
 
-    notices = json.loads(DATA_FILE.read_text(encoding="utf-8"))
+    notices = store.load_all()
     template = TEMPLATE.read_text(encoding="utf-8")
     updated = datetime.now().strftime("%Y-%m-%d %H:%M")
 

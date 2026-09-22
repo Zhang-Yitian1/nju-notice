@@ -141,12 +141,6 @@ SOURCES = [
         ],
         "exclude": ["【新闻】"],
     },
-    {
-        "name": "公众号",
-        "type": "rss",
-        "pages": ["https://werss.lilystudio.space/feed/all.rss"],
-        "enrich": False,
-    },
 ]
 
 
@@ -229,6 +223,31 @@ def parse_rss(text):
     return items
 
 
+def write_json(path, data):
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(path)
+
+
+def filter_expired(notices):
+    """活动过期（截止日已过 / 太久没截止日）或通知超过保留期，则删除。"""
+    today = date.today()
+    keep, dropped = [], []
+    for n in notices:
+        if n.get("type") == "活动":
+            expired = (
+                n.get("deadline") and date.fromisoformat(n["deadline"]) < today
+            ) or n.get("date", "") < (
+                today - timedelta(days=RETENTION_ACTIVITY)
+            ).isoformat()
+        else:
+            expired = n.get("date", "") < (
+                today - timedelta(days=RETENTION_NOTICE)
+            ).isoformat()
+        (dropped if expired else keep).append(n)
+    return keep, dropped
+
+
 def scrape():
     if not SCRAPE_LOCK.acquire(blocking=False):
         print("已有抓取在进行，跳过本次")
@@ -297,22 +316,7 @@ def _scrape():
             n["organizer"] = organizer
         n["deadline"] = deadline
 
-    today = date.today()
-    keep = []
-    dropped = []
-    for n in notices:
-        if n["type"] == "活动":
-            expired = (
-                n["deadline"] and date.fromisoformat(n["deadline"]) < today
-            ) or n["date"] < (today - timedelta(days=RETENTION_ACTIVITY)).isoformat()
-        else:
-            expired = n["date"] < (
-                today - timedelta(days=RETENTION_NOTICE)
-            ).isoformat()
-        if expired:
-            dropped.append(n)
-        else:
-            keep.append(n)
+    keep, dropped = filter_expired(notices)
 
     print(f"过期清理：删除 {len(dropped)} 条")
     for n in dropped[:10]:
@@ -322,9 +326,7 @@ def _scrape():
     for i, n in enumerate(keep, start=1):
         n["id"] = i
 
-    tmp = DATA_FILE.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(keep, ensure_ascii=False, indent=2), encoding="utf-8")
-    tmp.replace(DATA_FILE)
+    write_json(DATA_FILE, keep)
     print(f"\n抓取完成，共 {len(keep)} 条，已写入 {DATA_FILE}")
     return len(keep)
 

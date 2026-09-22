@@ -1,4 +1,3 @@
-import json
 import os
 import threading
 import time
@@ -7,9 +6,11 @@ from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
 import scraper
+import store
 
 BASE = Path(__file__).parent
 DATA_FILE = BASE / "data" / "notices.json"
+WECHAT_FILE = BASE / "data" / "wechat.json"
 CSS_FILE = BASE / "static" / "style.css"
 
 GRADES = ["全部", "2026", "2025", "2024", "2023"]
@@ -20,12 +21,12 @@ REFRESH_MINUTES = int(os.environ.get("REFRESH_MINUTES", "30"))
 
 
 def load_notices():
-    if not DATA_FILE.exists():
-        return []
-    try:
-        return json.loads(DATA_FILE.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return []
+    return store.load_all()
+
+
+def data_mtime():
+    times = [f.stat().st_mtime for f in (DATA_FILE, WECHAT_FILE) if f.exists()]
+    return max(times) if times else None
 
 
 def humanize(ts):
@@ -78,7 +79,7 @@ def render_index(grade, refreshing=False):
     else:
         body = '<div class="empty">这个年级暂时没有通知</div>'
 
-    updated = DATA_FILE.stat().st_mtime if DATA_FILE.exists() else None
+    updated = data_mtime()
     if refreshing:
         banner = '<div class="banner">正在更新数据，40 秒后自动刷新…</div>'
         meta_refresh = '<meta http-equiv="refresh" content="40">'
