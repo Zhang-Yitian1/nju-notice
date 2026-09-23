@@ -14,6 +14,7 @@ WECHAT_FILE = BASE / "data" / "wechat.json"
 CSS_FILE = BASE / "static" / "style.css"
 
 GRADES = ["全部", "2026", "2025", "2024", "2023"]
+TYPES = ["全部", "活动", "通知"]
 
 TYPE_CLASS = {"活动": "activity", "通知": "notice"}
 
@@ -43,16 +44,23 @@ def humanize(ts):
     return f"{hours // 24} 天前"
 
 
-def render_index(grade, refreshing=False):
+def render_index(grade, ntype="全部", refreshing=False):
     notices = load_notices()
     if grade and grade != "全部":
         notices = [n for n in notices if grade in n["grades"]]
+    if ntype and ntype != "全部":
+        notices = [n for n in notices if n.get("type") == ntype]
     notices.sort(key=lambda n: n["date"], reverse=True)
 
-    filter_links = ""
+    grade_links = ""
     for g in GRADES:
         active = "active" if g == grade else ""
-        filter_links += f'<a class="{active}" href="/?grade={g}">{g}</a>'
+        grade_links += f'<a class="{active}" href="/?grade={g}&type={ntype}">{g}</a>'
+
+    type_links = ""
+    for t in TYPES:
+        active = "active" if t == ntype else ""
+        type_links += f'<a class="{active}" href="/?grade={grade}&type={t}">{t}</a>'
 
     if notices:
         items = ""
@@ -77,7 +85,7 @@ def render_index(grade, refreshing=False):
             </li>"""
         body = f"<ul>{items}</ul>"
     else:
-        body = '<div class="empty">这个年级暂时没有通知</div>'
+        body = '<div class="empty">没有符合条件的通知</div>'
 
     updated = data_mtime()
     if refreshing:
@@ -113,7 +121,8 @@ def render_index(grade, refreshing=False):
   </div>
   <div class="sub">聚合校内通知与活动 · 按年级筛选 · 数据更新于 {humanize(updated)}</div>
   {banner}
-  <div class="filters">{filter_links}</div>
+  <div class="filters">{grade_links}</div>
+  <div class="filters type">{type_links}</div>
   {body}
   <script>
     (function () {{
@@ -156,8 +165,9 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/":
             query = parse_qs(parsed.query)
             grade = query.get("grade", ["全部"])[0]
+            ntype = query.get("type", ["全部"])[0]
             refreshing = query.get("refreshing", ["0"])[0] == "1"
-            html = render_index(grade, refreshing).encode("utf-8")
+            html = render_index(grade, ntype, refreshing).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.end_headers()

@@ -20,12 +20,15 @@
   </div>
   <div class="sub">聚合校内通知与活动 · 按年级筛选 · 更新于 __UPDATED__</div>
   <div class="filters" id="filters"></div>
+  <div class="filters type" id="typeFilters"></div>
   <ul id="list"></ul>
   <script>
     var NOTICES = __NOTICES__;
     var GRADES = ["全部", "2026", "2025", "2024", "2023"];
+    var TYPES = ["全部", "活动", "通知"];
     var TYPE_CLASS = { "活动": "activity", "通知": "notice" };
     var current = "全部";
+    var currentType = "全部";
 
     function esc(s) {
       return String(s).replace(/[&<>"]/g, function (c) {
@@ -36,7 +39,9 @@
     function render() {
       var list = document.getElementById("list");
       var items = NOTICES.filter(function (n) {
-        return current === "全部" || n.grades.indexOf(current) !== -1;
+        var okGrade = current === "全部" || n.grades.indexOf(current) !== -1;
+        var okType = currentType === "全部" || n.type === currentType;
+        return okGrade && okType;
       });
       items.sort(function (a, b) { return a.date < b.date ? 1 : -1; });
       if (!items.length) {
@@ -70,6 +75,20 @@
       });
     }
 
+    function renderTypeFilters() {
+      var box = document.getElementById("typeFilters");
+      box.innerHTML = TYPES.map(function (t) {
+        return '<a class="' + (t === currentType ? "active" : "") + '" data-type="' + t + '" href="javascript:;">' + t + "</a>";
+      }).join("");
+      box.querySelectorAll("a").forEach(function (a) {
+        a.addEventListener("click", function () {
+          currentType = a.dataset.type;
+          renderTypeFilters();
+          render();
+        });
+      });
+    }
+
     var btn = document.getElementById("themeToggle");
     function refreshBtn() {
       btn.textContent = document.documentElement.dataset.theme === "dark" ? "浅色" : "深色";
@@ -83,6 +102,7 @@
     });
 
     renderFilters();
+    renderTypeFilters();
     render();
   </script>
 </body>

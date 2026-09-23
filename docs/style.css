@@ -86,6 +86,10 @@ h1 {
   margin-bottom: 16px;
 }
 
+.filters.type {
+  margin-top: -6px;
+}
+
 .filters a {
   padding: 6px 14px;
   border-radius: 999px;
