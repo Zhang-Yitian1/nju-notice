@@ -261,6 +261,7 @@ def scrape():
 def _scrape():
     seen = set()
     notices = []
+    total_fetched = 0
 
     for source in SOURCES:
         print(f"[{source['name']}]")
@@ -277,6 +278,8 @@ def _scrape():
                 parser = source["parser"](url)
                 parser.feed(html)
                 raw_items = parser.items
+
+            total_fetched += len(raw_items)
 
             added = 0
             for raw in raw_items:
@@ -306,6 +309,10 @@ def _scrape():
                 added += 1
             print(f"  {url} -> 新增 {added} 条")
             time.sleep(0.5)
+
+    if total_fetched == 0:
+        print("\n所有来源均未获取到内容（网络异常或站点改版），保留原有数据，不覆盖。")
+        return 0
 
     print(f"\n抽取正文信息（发布单位 / 截止日期）…")
     for n in notices:

@@ -1,6 +1,6 @@
 import json
 import shutil
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import scraper
@@ -11,13 +11,16 @@ TEMPLATE = BASE / "templates" / "index.html"
 CSS = BASE / "static" / "style.css"
 OUT_DIR = BASE / "docs"
 
+# CI（GitHub Actions）跑在 UTC，这里统一按北京时间显示
+BEIJING = timezone(timedelta(hours=8))
+
 
 def main():
     scraper.scrape()
 
     notices = store.load_all()
     template = TEMPLATE.read_text(encoding="utf-8")
-    updated = datetime.now().strftime("%Y-%m-%d %H:%M")
+    updated = datetime.now(BEIJING).strftime("%Y-%m-%d %H:%M")
 
     html = template.replace(
         "__NOTICES__", json.dumps(notices, ensure_ascii=False)

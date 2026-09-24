@@ -8,6 +8,10 @@ def main():
     text = scraper.fetch(RSS_URL)
     raw_items = scraper.parse_rss(text)
 
+    if not raw_items:
+        print("公众号 RSS 未解析到任何内容，保留原有数据，不覆盖。")
+        return
+
     notices = []
     for raw in raw_items:
         title = raw["title"]
