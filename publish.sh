@@ -1,7 +1,17 @@
 #!/bin/sh
 # 抓取公众号 → 提交 → 推送。推送 GitHub 需要梯子。
+# 现在公众号也会在 CI 里自动更新，本脚本仅用于本地手动跑。
 set -e
 cd "$(dirname "$0")"
+
+# 本地密钥（可选，切勿提交）：把下面两行写进同目录的 .env
+#   WERSS_AK=你的AccessKey
+#   WERSS_SK=你的SecretKey
+if [ -f .env ]; then
+  set -a
+  . ./.env
+  set +a
+fi
 
 python3 fetch_wechat.py
 

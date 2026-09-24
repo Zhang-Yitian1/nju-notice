@@ -24,6 +24,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
+      - name: 抓取公众号（有密钥走 API，无则退回 RSS）
+        env:
+          WERSS_AK: ${{ secrets.WERSS_AK }}
+          WERSS_SK: ${{ secrets.WERSS_SK }}
+          WECHAT_LIMIT: "60"
+        run: python fetch_wechat.py
       - name: 生成静态站点
         run: python build_static.py
       - uses: actions/configure-pages@v5
