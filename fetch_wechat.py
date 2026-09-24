@@ -107,10 +107,22 @@ def to_notice(raw):
 
 def collect():
     if ACCESS_KEY and SECRET_KEY:
-        print("使用 WeRSS API 抓取公众号…")
-        return fetch_via_api()
-    print("未配置 WERSS_AK / WERSS_SK，退回公开 RSS…")
-    return fetch_via_rss()
+        try:
+            print("使用 WeRSS API 抓取公众号…")
+            items = fetch_via_api()
+            if items:
+                return items
+            print("API 未返回内容，尝试退回 RSS…")
+        except Exception as e:
+            print(f"API 抓取失败：{e}，尝试退回 RSS…")
+    else:
+        print("未配置 WERSS_AK / WERSS_SK，使用公开 RSS…")
+
+    try:
+        return fetch_via_rss()
+    except Exception as e:
+        print(f"RSS 抓取也失败：{e}")
+        return []
 
 
 def main():
