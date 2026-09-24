@@ -22,5 +22,15 @@ if git diff --cached --quiet; then
 fi
 
 git commit -m "更新公众号数据 $(date '+%Y-%m-%d %H:%M')"
-git push
+
+# 推送：先直连，失败再走本地代理（端口可用 PROXY_PORT 覆盖，默认 9674）
+PROXY="http://127.0.0.1:${PROXY_PORT:-9674}"
+if git push; then
+  :
+elif git -c http.proxy="$PROXY" -c https.proxy="$PROXY" push; then
+  :
+else
+  echo "推送失败：请确认梯子已开启（当前代理 ${PROXY}）"
+  exit 1
+fi
 echo "已推送，GitHub 会自动重新构建网站（约 2 分钟）"
